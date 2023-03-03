@@ -1,15 +1,20 @@
 FROM nginx:latest
 
+ARG FOGLAMP_DISTRIBUTION
+ARG FOGLAMP_PLATFORM
+ARG FOGLAMP_VERSION
+
 # Set FogLAMP version, distribution, and platform
-ENV FOGLAMP_VERSION=1.8.2
-ENV FOGLAMP_DISTRIBUTION=ubuntu1804
-ENV FOGLAMP_PLATFORM=x86_64
+ENV FOGLAMP_VERSION=$FOGLAMP_VERSION
+ENV FOGLAMP_DISTRIBUTION=$FOGLAMP_DISTRIBUTION
+ENV FOGLAMP_PLATFORM=$FOGLAMP_PLATFORM
+
 
 RUN apt update && \ 
     apt install -y wget && \ 
-    wget --no-check-certificate https://foglamp.s3.amazonaws.com/${FOGLAMP_VERSION}/${FOGLAMP_DISTRIBUTION}/${FOGLAMP_PLATFORM}/foglamp-${FOGLAMP_VERSION}_${FOGLAMP_PLATFORM}_${FOGLAMP_DISTRIBUTION}.tgz && \
+    wget -q --no-check-certificate https://foglamp.s3.amazonaws.com/${FOGLAMP_VERSION}/${FOGLAMP_DISTRIBUTION}/${FOGLAMP_PLATFORM}/foglamp-${FOGLAMP_VERSION}_${FOGLAMP_PLATFORM}_${FOGLAMP_DISTRIBUTION}.tgz && \
     tar -xzvf foglamp-${FOGLAMP_VERSION}_${FOGLAMP_PLATFORM}_${FOGLAMP_DISTRIBUTION}.tgz && \
-    dpkg --unpack /foglamp/${FOGLAMP_VERSION}/${FOGLAMP_DISTRIBUTION}/${FOGLAMP_PLATFORM}/foglamp-gui-${FOGLAMP_VERSION}.deb && \
+    dpkg --unpack /foglamp/${FOGLAMP_VERSION}/${FOGLAMP_DISTRIBUTION}/${FOGLAMP_PLATFORM}/foglamp-gui_${FOGLAMP_VERSION}.deb && \
     # remove files in the existing NGINX HTML directory
     rm -r /usr/share/nginx/html && \
     # move our FogLAMP GUI files to the NGINX HTML directory
