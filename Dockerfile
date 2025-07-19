@@ -26,13 +26,12 @@ ARG TARGETARCH
 # Select final stage based on TARGETARCH ARG
 FROM stage-${TARGETARCH} AS base
 
-
 # Set FogLAMP version, distribution, and platform
 ENV FOGLAMP_VERSION=3.1.0
 ENV FOGLAMP_DISTRIBUTION=$FOGLAMP_DISTRIBUTION
 ENV FOGLAMP_PLATFORM=$FOGLAMP_PLATFORM
 
-
+# Install dependencies, add Dianomic repository and key
 RUN export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 && \
     apt-get update --allow-insecure-repositories && \
     apt-get install -y --no-install-recommends --allow-unauthenticated -o APT::Install-Suggests=false -o APT::Install-Recommends=false \
@@ -48,7 +47,7 @@ RUN export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 && \
     apt-get update && apt-get upgrade -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install FogLAMP GUI - Complete installation with workaround for template file issue
+# Install FogLAMP GUI - Workaoround systemctl issues in containers
 RUN echo "#!/bin/sh\nexit 0" > /usr/bin/systemctl && \
     chmod +x /usr/bin/systemctl && \ 
     apt-get update && \
@@ -61,6 +60,8 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/bin/systemctl && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* && \
     echo "FogLAMP GUI installation completed successfully"
 
+# Startup script to launch nginx and keep container running
+# Tails nginx logs to keep container alive
 RUN echo "#!/bin/bash" > /usr/local/bin/start.sh && \
     echo "nginx &"  >> /usr/local/bin/start.sh && \
     echo "echo 'FogLAMP GUI is running...'" >> /usr/local/bin/start.sh && \
