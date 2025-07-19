@@ -1,7 +1,7 @@
 
 services:
   foglamp-gui:
-    image: robraesemann/foglamp-gui:latest-arm64
+    build: .
     container_name: foglamp-gui
     ports:
       - "8000:80"
